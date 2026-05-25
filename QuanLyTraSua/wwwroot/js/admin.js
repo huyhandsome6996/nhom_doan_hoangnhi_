@@ -310,7 +310,7 @@ window.chrome.webview.addEventListener('message', function(e) {
       case 'layDonHang':
         if (res.ok) {
           dsDonHang = res.data;
-          if (document.getElementById('page-dashboard').style.display !== 'none') { loadDashboard(); }
+          if (document.getElementById('page-dashboard').style.display !== 'none') { renderDashboard(dsDonHang, dsSanPham); }
           else renderOrders(res.data);
         }
         break;
