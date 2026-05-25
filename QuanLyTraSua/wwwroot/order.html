@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Đặt Món - Quán Trà Sữa</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h1>🧋 Trà Sữa</h1>
+      <p>Take Away System</p>
+    </div>
+    <nav>
+      <div class="nav-item active" onclick="showTab('menu')">
+        <span class="nav-icon">🍵</span> Gọi Món
+      </div>
+      <div class="nav-item" onclick="showTab('orders')">
+        <span class="nav-icon">📋</span> Đơn Của Tôi
+      </div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="user-avatar" id="avatarChar">K</div>
+        <div>
+          <div class="user-name" id="userNameDisplay">Khách hàng</div>
+          <span class="user-role">Khách hàng</span>
+        </div>
+      </div>
+      <button class="btn btn-secondary" style="width:100%; justify-content:center;" onclick="dangXuat()">
+        🚪 Đăng Xuất
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+    <!-- TAB: GỌI MÓN -->
+    <div id="tab-menu" class="tab-content">
+      <div class="topbar">
+        <h2>🍵 Thực Đơn</h2>
+        <div style="display:flex;gap:10px;">
+          <button class="tab-btn active" id="tabTraSua" onclick="filterMenu('TraSua')">Trà Sữa</button>
+          <button class="tab-btn" id="tabTopping" onclick="filterMenu('Topping')">Topping</button>
+        </div>
+      </div>
+      <div class="page-content" style="height:calc(100vh - 64px);overflow:hidden;padding:0;">
+        <div class="order-layout" style="padding:20px;height:100%;">
+          <!-- Menu Grid -->
+          <div style="overflow-y:auto;">
+            <div id="menuGrid" class="menu-grid"></div>
+          </div>
+          <!-- Cart -->
+          <div class="cart-panel">
+            <div class="cart-header">🛒 Giỏ Hàng (<span id="cartCount">0</span> món)</div>
+            <div class="cart-items" id="cartItems">
+              <div class="empty-state">
+                <div class="empty-state-icon">🛒</div>
+                <h3>Giỏ hàng trống</h3>
+                <p>Chọn món từ thực đơn bên trái</p>
+              </div>
+            </div>
+            <div class="cart-footer">
+              <div class="form-group">
+                <label class="form-label">Ghi chú</label>
+                <input id="ghiChu" class="form-control" placeholder="VD: ít đường, không đá...">
+              </div>
+              <div class="cart-total">
+                <span class="cart-total-label">Tổng cộng:</span>
+                <span class="cart-total-value" id="tongTien">0đ</span>
+              </div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="datMon()" id="btnDatMon">
+                ✅ Đặt Món
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: ĐƠN CỦA TÔI -->
+    <div id="tab-orders" class="tab-content" style="display:none;">
+      <div class="topbar"><h2>📋 Đơn Hàng Của Tôi</h2></div>
+      <div class="page-content">
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th>Mã đơn</th><th>Thời gian</th><th>Tổng tiền</th><th>Trạng thái</th><th>Ghi chú</th>
+              </tr></thead>
+              <tbody id="orderTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL CHỌN SIZE/ĐƯỜNG -->
+<div class="modal-overlay" id="optionModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="optionModalTitle">⚙️ Tùy chọn</span>
+      <button class="modal-close" onclick="closeModal('optionModal')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Size</label>
+      <div style="display:flex;gap:8px;" id="sizeGroup">
+        <button class="btn btn-secondary size-opt active" data-size="Size M" onclick="selectSize(this, 'Size M')">Size M</button>
+        <button class="btn btn-secondary size-opt" data-size="Size L" onclick="selectSize(this, 'Size L')">Size L (+5k)</button>
+      </div>
+    </div>
+    <div class="form-group" id="sugarGroup">
+      <label class="form-label">Mức đường</label>
+      <select class="form-control" id="sugarLevel">
+        <option>100% Đường</option><option>70% Đường</option>
+        <option>50% Đường</option><option>30% Đường</option><option>Không đường</option>
+      </select>
+    </div>
+    <div class="form-group" id="iceGroup">
+      <label class="form-label">Mức đá</label>
+      <select class="form-control" id="iceLevel">
+        <option>Nhiều đá</option><option>Ít đá</option><option>Không đá</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('optionModal')">Hủy</button>
+      <button class="btn btn-primary" onclick="addToCart()">🛒 Thêm vào giỏ</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+  const nd = JSON.parse(sessionStorage.getItem('nguoiDung') || '{}');
+  if (!nd.id) window.location.href = 'login.html';
+  document.getElementById('userNameDisplay').textContent = nd.hoTen || nd.HoTen || 'Khách';
+  document.getElementById('avatarChar').textContent = (nd.hoTen || nd.HoTen || 'K')[0].toUpperCase();
+
+  let dsSanPham = [], giohang = [], selectedProduct = null, selectedSize = 'Size M';
+  let currentFilter = 'TraSua';
+
+  function showTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+    document.getElementById('tab-' + tab).style.display = 'flex';
+    document.getElementById('tab-' + tab).style.flexDirection = 'column';
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    if (tab === 'orders') loadOrders();
+    if (tab === 'menu') document.getElementById('tab-menu').style.display = 'block';
+  }
+
+  function filterMenu(loai) {
+    currentFilter = loai;
+    document.getElementById('tabTraSua').classList.toggle('active', loai === 'TraSua');
+    document.getElementById('tabTopping').classList.toggle('active', loai === 'Topping');
+    sendMsg('laySanPham', { loai });
+  }
+
+  function renderMenu(items) {
+    const grid = document.getElementById('menuGrid');
+    const filtered = items.filter(sp => sp.dangBan || sp.DangBan);
+    if (!filtered.length) {
+      grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🍵</div><h3>Chưa có sản phẩm</h3></div>';
+      return;
+    }
+    grid.innerHTML = filtered.map(sp => `
+      <div class="menu-card fade-in" onclick="openOption(${sp.id || sp.Id})">
+        <div class="menu-card-img">${(sp.loai || sp.Loai) === 'TraSua' ? '🧋' : '🍮'}</div>
+        <div class="menu-card-body">
+          <div class="menu-card-name">${sp.tenSanPham || sp.TenSanPham}</div>
+          <div class="menu-card-price">${fmt(sp.giaCoBan || sp.GiaCoBan)}</div>
+          <span class="badge badge-${(sp.loai||sp.Loai).toLowerCase()}" style="margin-top:6px;">${sp.loai || sp.Loai}</span>
+        </div>
+      </div>`).join('');
+  }
+
+  function openOption(spId) {
+    selectedProduct = dsSanPham.find(s => (s.id || s.Id) === spId);
+    if (!selectedProduct) return;
+    document.getElementById('optionModalTitle').textContent = `⚙️ ${selectedProduct.tenSanPham || selectedProduct.TenSanPham}`;
+    const isTraSua = (selectedProduct.loai || selectedProduct.Loai) === 'TraSua';
+    document.getElementById('sizeGroup').style.display = isTraSua ? 'flex' : 'none';
+    document.getElementById('sugarGroup').style.display = isTraSua ? 'block' : 'none';
+    document.getElementById('iceGroup').style.display = isTraSua ? 'block' : 'none';
+    selectedSize = 'Size M';
+    document.querySelectorAll('.size-opt').forEach(b => b.classList.toggle('active', b.dataset.size === 'Size M'));
+    openModal('optionModal');
+  }
+
+  function selectSize(btn, size) {
+    selectedSize = size;
+    document.querySelectorAll('.size-opt').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function addToCart() {
+    if (!selectedProduct) return;
+    const isTraSua = (selectedProduct.loai || selectedProduct.Loai) === 'TraSua';
+    let tuyChon = '';
+    if (isTraSua) {
+      tuyChon = `${selectedSize}, ${document.getElementById('sugarLevel').value}, ${document.getElementById('iceLevel').value}`;
+    }
+    const phuPhi = (isTraSua && selectedSize === 'Size L') ? 5000 : 0;
+    const donGia = (selectedProduct.giaCoBan || selectedProduct.GiaCoBan) + phuPhi;
+
+    const existing = giohang.find(i => i.sanPhamId === (selectedProduct.id || selectedProduct.Id) && i.tuyChonThem === tuyChon);
+    if (existing) {
+      existing.soLuong++;
+      existing.thanhTien = existing.donGia * existing.soLuong;
+    } else {
+      giohang.push({
+        sanPhamId: selectedProduct.id || selectedProduct.Id,
+        tenSanPham: selectedProduct.tenSanPham || selectedProduct.TenSanPham,
+        soLuong: 1,
+        donGia: donGia,
+        thanhTien: donGia,
+        tuyChonThem: tuyChon
+      });
+    }
+    closeModal('optionModal');
+    renderCart();
+    toast('success', `✅ Đã thêm ${selectedProduct.tenSanPham || selectedProduct.TenSanPham}`);
+  }
+
+  function renderCart() {
+    const container = document.getElementById('cartItems');
+    document.getElementById('cartCount').textContent = giohang.reduce((s, i) => s + i.soLuong, 0);
+    if (!giohang.length) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🛒</div><h3>Giỏ hàng trống</h3><p>Chọn món từ thực đơn bên trái</p></div>';
+      document.getElementById('tongTien').textContent = '0đ';
+      return;
+    }
+    container.innerHTML = giohang.map((item, i) => `
+      <div class="cart-item">
+        <div style="flex:1;min-width:0;">
+          <div class="cart-item-name">${item.tenSanPham}</div>
+          ${item.tuyChonThem ? `<div class="cart-item-opt">${item.tuyChonThem}</div>` : ''}
+          <div class="cart-item-price">${fmt(item.thanhTien)}</div>
+        </div>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty(${i},-1)">−</button>
+          <span class="qty-num">${item.soLuong}</span>
+          <button class="qty-btn" onclick="changeQty(${i},1)">+</button>
+        </div>
+      </div>`).join('');
+    const total = giohang.reduce((s, i) => s + i.thanhTien, 0);
+    document.getElementById('tongTien').textContent = fmt(total);
+  }
+
+  function changeQty(idx, delta) {
+    giohang[idx].soLuong += delta;
+    if (giohang[idx].soLuong <= 0) giohang.splice(idx, 1);
+    else giohang[idx].thanhTien = giohang[idx].donGia * giohang[idx].soLuong;
+    renderCart();
+  }
+
+  function datMon() {
+    if (!giohang.length) { toast('error', '❌ Giỏ hàng trống!'); return; }
+    const ghiChu = document.getElementById('ghiChu').value;
+    sendMsg('datMon', {
+      ghiChu,
+      items: giohang.map(i => ({ sanPhamId: i.sanPhamId, soLuong: i.soLuong, tuyChonThem: i.tuyChonThem }))
+    });
+  }
+
+  function loadOrders() { sendMsg('layDonHang', { filter: 'cuaToi' }); }
+
+  function renderOrders(items) {
+    const tbody = document.getElementById('orderTableBody');
+    if (!items.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--clr-text-muted);">Chưa có đơn hàng nào</td></tr>'; return; }
+    tbody.innerHTML = items.map(dh => `
+      <tr>
+        <td><strong>#${dh.id || dh.Id}</strong></td>
+        <td>${dh.thoiGianDat || dh.ThoiGianDat}</td>
+        <td style="color:var(--clr-primary);font-weight:700;">${fmt(dh.tongTien || dh.TongTien)}</td>
+        <td>${badgeTrangThai(dh.trangThai || dh.TrangThai)}</td>
+        <td style="color:var(--clr-text-muted);">${dh.ghiChu || dh.GhiChu || '—'}</td>
+      </tr>`).join('');
+  }
+
+  // ===== UTILS =====
+  function fmt(n) { return Number(n).toLocaleString('vi-VN') + 'đ'; }
+  function badgeTrangThai(t) {
+    const map = {'Chờ xác nhận':'warning','Đang pha chế':'info','Hoàn thành':'success','Đã hủy':'danger'};
+    return `<span class="badge badge-${map[t]||'info'}">${t}</span>`;
+  }
+  function openModal(id) { document.getElementById(id).classList.add('show'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+  function sendMsg(action, data) {
+    window.chrome.webview.postMessage(JSON.stringify({ action, data: data || {} }));
+  }
+  function toast(type, msg) {
+    const div = document.createElement('div');
+    div.className = `toast ${type}`;
+    div.innerHTML = msg;
+    document.getElementById('toastContainer').appendChild(div);
+    setTimeout(() => div.remove(), 3500);
+  }
+  function dangXuat() {
+    sendMsg('dangXuat', {});
+    sessionStorage.clear();
+    window.location.href = 'login.html';
+  }
+
+  // ===== WEBVIEW MESSAGE HANDLER =====
+  window.chrome.webview.addEventListener('message', function(e) {
+    try {
+      const res = JSON.parse(e.data);
+      if (res.action === 'laySanPham' && res.ok) {
+        dsSanPham = res.data;
+        renderMenu(res.data);
+      } else if (res.action === 'datMon') {
+        if (res.ok) {
+          giohang = [];
+          renderCart();
+          document.getElementById('ghiChu').value = '';
+          toast('success', `🎉 Đặt món thành công! Đơn #${res.donHangId}`);
+        } else {
+          toast('error', '❌ ' + (res.loi || 'Đặt món thất bại'));
+        }
+      } else if (res.action === 'layDonHang' && res.ok) {
+        renderOrders(res.data);
+      }
+    } catch(err) { console.error(err); }
+  });
+
+  // INIT
+  filterMenu('TraSua');
+</script>
+</body>
+</html>
