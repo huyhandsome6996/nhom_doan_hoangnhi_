@@ -30,4 +30,4 @@
 | 2026-05-25 20:38 | **BUILD THÀNH CÔNG** | — | `dotnet build` → **0 errors, 0 warnings** | ✅ Dự án compile OK |
 | 2026-05-25 20:48 | Nâng cấp Framework | `QuanLyTraSua.csproj` | — | Đổi `TargetFramework` thành `net10.0-windows` để tương thích runtime máy |
 | 2026-05-25 20:48 | Chạy chương trình | — | `dotnet run --project QuanLyTraSua\QuanLyTraSua.csproj` | Khởi chạy ứng dụng Desktop WinForms thành công |
-
+| 2026-05-25 20:51 | Dừng chương trình chạy ngầm | — | Stop-Process / Terminate | Tắt tiến trình ứng dụng để giải phóng tài nguyên và file khóa |
