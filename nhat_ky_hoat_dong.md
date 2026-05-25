@@ -33,3 +33,4 @@
 | 2026-05-25 20:51 | Dừng chương trình chạy ngầm | — | Stop-Process / Terminate | Tắt tiến trình ứng dụng để giải phóng tài nguyên và file khóa |
 | 2026-05-25 21:05 | Sửa logic validation DonHangId | `Entities/ChiTietDonHang.cs` | — | Sửa kiểm tra `value <= 0` thành `value < 0` để cho phép ID = 0 đối với chi tiết đơn hàng tạm thời (chưa lưu DB) |
 | 2026-05-25 21:05 | Sửa lỗi redirect khi đăng nhập | `wwwroot/login.html`, `wwwroot/order.html` | — | Sửa thuộc tính kiểm tra phiên đăng nhập để hỗ trợ cả PascalCase (`Id`, `VaiTro`) và camelCase, sửa lỗi kẹt màn hình "đang xử lý" |
+| 2026-05-25 21:09 | Sửa lỗi phân biệt chữ hoa chữ thường của JSON | `GUI/MainForm.cs` | — | Bật `PropertyNameCaseInsensitive = true` để nhận chính xác các trường dữ liệu (`action`, `data`) gửi từ JavaScript |

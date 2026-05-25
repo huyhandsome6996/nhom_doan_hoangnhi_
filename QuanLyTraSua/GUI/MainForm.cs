@@ -79,7 +79,7 @@ namespace QuanLyTraSua.GUI
             try
             {
                 string msgJson = e.TryGetWebMessageAsString();
-                var msg = JsonSerializer.Deserialize<WebMessage>(msgJson);
+                var msg = JsonSerializer.Deserialize<WebMessage>(msgJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 if (msg == null) return;
 
                 string response = msg.Action switch
