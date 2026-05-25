@@ -137,7 +137,7 @@
 
 <script>
   const nd = JSON.parse(sessionStorage.getItem('nguoiDung') || '{}');
-  if (!nd.id) window.location.href = 'login.html';
+  if (!nd.id && !nd.Id) window.location.href = 'login.html';
   document.getElementById('userNameDisplay').textContent = nd.hoTen || nd.HoTen || 'Khách';
   document.getElementById('avatarChar').textContent = (nd.hoTen || nd.HoTen || 'K')[0].toUpperCase();
 

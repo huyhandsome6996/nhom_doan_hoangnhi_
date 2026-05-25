@@ -31,3 +31,5 @@
 | 2026-05-25 20:48 | Nâng cấp Framework | `QuanLyTraSua.csproj` | — | Đổi `TargetFramework` thành `net10.0-windows` để tương thích runtime máy |
 | 2026-05-25 20:48 | Chạy chương trình | — | `dotnet run --project QuanLyTraSua\QuanLyTraSua.csproj` | Khởi chạy ứng dụng Desktop WinForms thành công |
 | 2026-05-25 20:51 | Dừng chương trình chạy ngầm | — | Stop-Process / Terminate | Tắt tiến trình ứng dụng để giải phóng tài nguyên và file khóa |
+| 2026-05-25 21:05 | Sửa logic validation DonHangId | `Entities/ChiTietDonHang.cs` | — | Sửa kiểm tra `value <= 0` thành `value < 0` để cho phép ID = 0 đối với chi tiết đơn hàng tạm thời (chưa lưu DB) |
+| 2026-05-25 21:05 | Sửa lỗi redirect khi đăng nhập | `wwwroot/login.html`, `wwwroot/order.html` | — | Sửa thuộc tính kiểm tra phiên đăng nhập để hỗ trợ cả PascalCase (`Id`, `VaiTro`) và camelCase, sửa lỗi kẹt màn hình "đang xử lý" |

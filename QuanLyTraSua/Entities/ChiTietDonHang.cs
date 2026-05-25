@@ -29,7 +29,7 @@ namespace QuanLyTraSua.Entities
             get => _donHangId;
             set
             {
-                if (value <= 0)
+                if (value < 0)
                     throw new ArgumentException("ID Đơn hàng không hợp lệ!");
                 _donHangId = value;
             }

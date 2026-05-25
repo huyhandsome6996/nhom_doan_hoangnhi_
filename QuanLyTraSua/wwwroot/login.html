@@ -82,7 +82,8 @@
           document.getElementById('btnDangNhap').textContent = '🔓 Đăng Nhập';
           if (res.ok) {
             sessionStorage.setItem('nguoiDung', JSON.stringify(res.nguoiDung));
-            window.location.href = res.nguoiDung.vaiTro === 'KhachHang' ? 'order.html' : 'admin.html';
+            const role = res.nguoiDung.vaiTro || res.nguoiDung.VaiTro || '';
+            window.location.href = role === 'KhachHang' ? 'order.html' : 'admin.html';
           } else {
             hienLoi(res.loi || 'Đăng nhập thất bại!');
           }
