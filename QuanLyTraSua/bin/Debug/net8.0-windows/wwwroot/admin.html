@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Quản Trị - Quán Trà Sữa</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h1>🧋 Trà Sữa</h1>
+      <p>Admin Dashboard</p>
+    </div>
+    <nav>
+      <div class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span> Tổng quan</div>
+      <div class="nav-item" id="nav-orders" onclick="showPage('orders',this)"><span class="nav-icon">📋</span> Quản lý đơn hàng</div>
+      <div class="nav-item" id="nav-menu" onclick="showPage('menu',this)"><span class="nav-icon">🍵</span> Quản lý menu</div>
+      <div class="nav-item" id="nav-users" onclick="showPage('users',this)"><span class="nav-icon">👥</span> Quản lý tài khoản</div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="user-avatar" id="avatarChar">A</div>
+        <div>
+          <div class="user-name" id="userNameDisplay">Admin</div>
+          <span class="user-role" id="userRoleDisplay">Admin</span>
+        </div>
+      </div>
+      <button class="btn btn-secondary" style="width:100%;justify-content:center;" onclick="dangXuat()">🚪 Đăng Xuất</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div id="page-dashboard" class="page-section">
+      <div class="topbar"><h2>📊 Tổng Quan</h2></div>
+      <div class="page-content">
+        <div class="stat-grid" id="statGrid"></div>
+        <div class="card">
+          <h3 style="margin-bottom:16px;font-size:1rem;">📋 Đơn Hàng Mới Nhất</h3>
+          <div class="table-wrap">
+            <table><thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Thời gian</th><th>Tổng tiền</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+            <tbody id="recentOrdersBody"></tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== QUẢN LÝ ĐƠN HÀNG ===== -->
+    <div id="page-orders" class="page-section" style="display:none;">
+      <div class="topbar">
+        <h2>📋 Quản Lý Đơn Hàng</h2>
+        <button class="btn btn-secondary" onclick="loadOrders()">🔄 Làm mới</button>
+      </div>
+      <div class="page-content">
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="filterOrders('',this)">Tất cả</button>
+          <button class="tab-btn" onclick="filterOrders('Chờ xác nhận',this)">Chờ xác nhận</button>
+          <button class="tab-btn" onclick="filterOrders('Đang pha chế',this)">Đang pha chế</button>
+          <button class="tab-btn" onclick="filterOrders('Hoàn thành',this)">Hoàn thành</button>
+          <button class="tab-btn" onclick="filterOrders('Đã hủy',this)">Đã hủy</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table><thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Thời gian</th><th>Tổng tiền</th><th>Trạng thái</th><th>Ghi chú</th><th>Thao tác</th></tr></thead>
+            <tbody id="ordersTableBody"></tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== QUẢN LÝ MENU ===== -->
+    <div id="page-menu" class="page-section" style="display:none;">
+      <div class="topbar">
+        <h2>🍵 Quản Lý Menu</h2>
+        <button class="btn btn-primary" onclick="openSanPhamModal()">➕ Thêm sản phẩm</button>
+      </div>
+      <div class="page-content">
+        <div class="search-bar">
+          <div class="search-input-wrap">
+            <span class="search-icon">🔍</span>
+            <input id="searchSP" class="form-control" placeholder="Tìm sản phẩm..." oninput="filterSanPham()">
+          </div>
+          <div class="tab-bar" style="margin-bottom:0;">
+            <button class="tab-btn active" onclick="filterLoai('',this)">Tất cả</button>
+            <button class="tab-btn" onclick="filterLoai('TraSua',this)">Trà Sữa</button>
+            <button class="tab-btn" onclick="filterLoai('Topping',this)">Topping</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table><thead><tr><th>ID</th><th>Tên sản phẩm</th><th>Giá cơ bản</th><th>Loại</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+            <tbody id="menuTableBody"></tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== QUẢN LÝ TÀI KHOẢN ===== -->
+    <div id="page-users" class="page-section" style="display:none;">
+      <div class="topbar">
+        <h2>👥 Quản Lý Tài Khoản</h2>
+        <button class="btn btn-primary" onclick="openUserModal()">➕ Thêm tài khoản</button>
+      </div>
+      <div class="page-content">
+        <div class="card">
+          <div class="table-wrap">
+            <table><thead><tr><th>ID</th><th>Tên đăng nhập</th><th>Họ tên</th><th>Vai trò</th><th>Thao tác</th></tr></thead>
+            <tbody id="usersTableBody"></tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL SẢN PHẨM -->
+<div class="modal-overlay" id="sanPhamModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="spModalTitle">➕ Thêm Sản Phẩm</span>
+      <button class="modal-close" onclick="closeModal('sanPhamModal')">✕</button>
+    </div>
+    <input type="hidden" id="spId">
+    <div class="form-group">
+      <label class="form-label">Tên sản phẩm</label>
+      <input id="spTen" class="form-control" placeholder="VD: Trà Sữa Matcha...">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Giá cơ bản (đ)</label>
+        <input id="spGia" class="form-control" type="number" min="0" placeholder="35000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Loại</label>
+        <select id="spLoai" class="form-control">
+          <option value="TraSua">Trà Sữa</option>
+          <option value="Topping">Topping</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Trạng thái</label>
+      <select id="spDangBan" class="form-control">
+        <option value="true">Còn hàng</option>
+        <option value="false">Hết hàng</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('sanPhamModal')">Hủy</button>
+      <button class="btn btn-primary" onclick="luuSanPham()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NGƯỜI DÙNG -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="userModalTitle">➕ Thêm Tài Khoản</span>
+      <button class="modal-close" onclick="closeModal('userModal')">✕</button>
+    </div>
+    <input type="hidden" id="userId">
+    <div class="form-group">
+      <label class="form-label">Họ tên</label>
+      <input id="userHoTen" class="form-control" placeholder="Nguyễn Văn A">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Tên đăng nhập</label>
+        <input id="userTenDN" class="form-control" placeholder="nguyenvana">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mật khẩu</label>
+        <input id="userMatKhau" class="form-control" type="password" placeholder="••••••••">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Vai trò</label>
+      <select id="userVaiTro" class="form-control">
+        <option value="KhachHang">Khách hàng</option>
+        <option value="NhanVien">Nhân viên</option>
+        <option value="Admin">Admin</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('userModal')">Hủy</button>
+      <button class="btn btn-primary" onclick="luuNguoiDung()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CHI TIẾT ĐƠN HÀNG (Quan hệ 2 đối tượng) -->
+<div class="modal-overlay" id="chiTietModal">
+  <div class="modal" style="max-width:650px;">
+    <div class="modal-header">
+      <span class="modal-title" id="chiTietTitle">📋 Chi Tiết Đơn Hàng</span>
+      <button class="modal-close" onclick="closeModal('chiTietModal')">✕</button>
+    </div>
+    <div id="chiTietBody"></div>
+    <div class="modal-footer" id="chiTietFooter"></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/admin.js"></script>
+</body>
+</html>
