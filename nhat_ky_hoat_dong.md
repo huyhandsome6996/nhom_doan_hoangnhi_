@@ -28,3 +28,6 @@
 | 2026-05-25 20:37 | Cập nhật csproj | `QuanLyTraSua.csproj` | — | Thêm copy wwwroot vào output |
 | 2026-05-25 20:38 | Fix lỗi build | `GUI/MainForm.cs` | `dotnet build` | Sửa `PostWebMessage` → `PostWebMessageAsString` |
 | 2026-05-25 20:38 | **BUILD THÀNH CÔNG** | — | `dotnet build` → **0 errors, 0 warnings** | ✅ Dự án compile OK |
+| 2026-05-25 20:48 | Nâng cấp Framework | `QuanLyTraSua.csproj` | — | Đổi `TargetFramework` thành `net10.0-windows` để tương thích runtime máy |
+| 2026-05-25 20:48 | Chạy chương trình | — | `dotnet run --project QuanLyTraSua\QuanLyTraSua.csproj` | Khởi chạy ứng dụng Desktop WinForms thành công |
+
