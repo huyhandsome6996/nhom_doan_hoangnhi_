@@ -36,3 +36,4 @@
 | 2026-05-25 21:09 | Sửa lỗi phân biệt chữ hoa chữ thường của JSON | `GUI/MainForm.cs` | — | Bật `PropertyNameCaseInsensitive = true` để nhận chính xác các trường dữ liệu (`action`, `data`) gửi từ JavaScript |
 | 2026-05-25 21:12 | Hỗ trợ chạy trực tiếp trên trình duyệt | `wwwroot/js/bridge.js`, `wwwroot/*.html` | — | Phát triển `bridge.js` tự động kích hoạt Mock Backend (localStorage) khi chạy trên trình duyệt thường mà không cần C# |
 | 2026-05-25 21:12 | Sửa lỗi lặp vô hạn ở dashboard | `wwwroot/js/admin.js` | — | Sửa `loadDashboard()` thành `renderDashboard()` khi nhận gói tin `layDonHang` để tránh spam request liên tục |
+| 2026-05-25 21:15 | Dừng chương trình chạy ngầm | — | Stop-Process | Tắt tiến trình ứng dụng theo yêu cầu của người dùng |
