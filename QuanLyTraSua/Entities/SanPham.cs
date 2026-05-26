@@ -17,108 +17,105 @@ namespace QuanLyTraSua.Entities
         private string _hinhAnh = string.Empty;
         private bool _dangBan = true;
 
-        // ===== ĐÓNG GÓI: Properties với validation =====
+        // ===== ĐÓNG GÓI (Encapsulation): Bảo vệ các thuộc tính của sản phẩm thông qua Getter/Setter =====
         public int Id
         {
-            get => _id;
-            set => _id = value;
+            get { return _id; }
+            set { _id = value; }
         }
 
         public string TenSanPham
         {
-            get => _tenSanPham;
+            get { return _tenSanPham; }
             set
             {
                 if (string.IsNullOrWhiteSpace(value))
+                {
                     throw new ArgumentException("Tên sản phẩm không được để trống!");
+                }
                 _tenSanPham = value.Trim();
             }
         }
 
-        /// <summary>
-        /// ĐÓNG GÓI: Validation GiaCoBan >= 0
-        /// </summary>
         public decimal GiaCoBan
         {
-            get => _giaCoBan;
+            get { return _giaCoBan; }
             set
             {
                 if (value < 0)
+                {
                     throw new ArgumentException("Giá cơ bản không được âm!");
+                }
                 _giaCoBan = value;
             }
         }
 
         public string Loai
         {
-            get => _loai;
-            protected set => _loai = value; // Chỉ lớp con mới set được
+            get { return _loai; }
+            protected set { _loai = value; } // Chỉ có lớp con kế thừa mới được sửa giá trị này
         }
 
         public string HinhAnh
         {
-            get => _hinhAnh;
-            set => _hinhAnh = value ?? string.Empty;
+            get { return _hinhAnh; }
+            set { _hinhAnh = value ?? string.Empty; }
         }
 
         public bool DangBan
         {
-            get => _dangBan;
-            set => _dangBan = value;
+            get { return _dangBan; }
+            set { _dangBan = value; }
         }
 
-        // ===== ĐA HÌNH: Hàm virtual TinhTien() =====
-        /// <summary>
-        /// ĐA HÌNH: Lớp con override để tính thêm tiền theo tùy chọn
-        /// </summary>
-        /// <param name="tuyChon">Chuỗi tùy chọn VD: "Size L, 50% Đường"</param>
-        /// <returns>Thành tiền sau khi cộng thêm theo tùy chọn</returns>
+        // ===== ĐA HÌNH (Polymorphism): Phương thức ảo TinhTien() để các lớp con ghi đè (override) =====
         public virtual decimal TinhTien(string tuyChon = "")
         {
+            // Mặc định trả về giá cơ bản
             return GiaCoBan;
         }
 
-        public override string ToString() => $"{TenSanPham} - {GiaCoBan:N0}đ [{Loai}]";
+        // In thông tin sản phẩm ra dạng chuỗi
+        public override string ToString()
+        {
+            return TenSanPham + " - " + GiaCoBan.ToString("N0") + "đ [" + Loai + "]";
+        }
     }
 
     // =======================================================
-    // KẾ THỪA: Lớp con TraSua kế thừa từ SanPham
+    // KẾ THỪA (Inheritance): Lớp con TraSua kế thừa lớp cha SanPham
     // =======================================================
-    /// <summary>
-    /// Lớp con TraSua - KẾ THỪA từ SanPham
-    /// ĐA HÌNH: Override TinhTien() cộng thêm tiền khi chọn Size L
-    /// </summary>
     public class TraSua : SanPham
     {
-        private const decimal PHU_PHI_SIZE_L = 5000m; // Thêm 5k khi chọn Size L
+        private const decimal PHU_PHI_SIZE_L = 5000m; // Phụ phí khi chọn size L
 
         public TraSua()
         {
-            Loai = "TraSua";
+            this.Loai = "TraSua";
         }
 
         public TraSua(int id, string tenSanPham, decimal giaCoBan, string hinhAnh = "", bool dangBan = true)
         {
-            Id = id;
-            TenSanPham = tenSanPham;
-            GiaCoBan = giaCoBan;
-            Loai = "TraSua";
-            HinhAnh = hinhAnh;
-            DangBan = dangBan;
+            this.Id = id;
+            this.TenSanPham = tenSanPham;
+            this.GiaCoBan = giaCoBan;
+            this.Loai = "TraSua";
+            this.HinhAnh = hinhAnh;
+            this.DangBan = dangBan;
         }
 
-        /// <summary>
-        /// ĐA HÌNH: Override - TraSua cộng thêm tiền khi chọn Size L
-        /// </summary>
+        // Ghi đè phương thức TinhTien của lớp cha (Tính đa hình)
         public override decimal TinhTien(string tuyChon = "")
         {
-            decimal gia = GiaCoBan;
+            decimal gia = this.GiaCoBan;
 
             if (!string.IsNullOrEmpty(tuyChon))
             {
-                // Phân tích chuỗi tùy chọn
+                // Nếu khách chọn Size L thì cộng thêm 5.000đ phụ phí
                 if (tuyChon.Contains("Size L", StringComparison.OrdinalIgnoreCase))
+                {
                     gia += PHU_PHI_SIZE_L;
+                }
             }
 
             return gia;
@@ -126,55 +123,53 @@ namespace QuanLyTraSua.Entities
     }
 
     // =======================================================
-    // KẾ THỪA: Lớp con Topping kế thừa từ SanPham
+    // KẾ THỪA (Inheritance): Lớp con Topping kế thừa lớp cha SanPham
     // =======================================================
-    /// <summary>
-    /// Lớp con Topping - KẾ THỪA từ SanPham
-    /// ĐA HÌNH: Override TinhTien() - Topping không cộng thêm tiền theo size
-    /// </summary>
     public class Topping : SanPham
     {
         public Topping()
         {
-            Loai = "Topping";
+            this.Loai = "Topping";
         }
 
         public Topping(int id, string tenSanPham, decimal giaCoBan, string hinhAnh = "", bool dangBan = true)
         {
-            Id = id;
-            TenSanPham = tenSanPham;
-            GiaCoBan = giaCoBan;
-            Loai = "Topping";
-            HinhAnh = hinhAnh;
-            DangBan = dangBan;
+            this.Id = id;
+            this.TenSanPham = tenSanPham;
+            this.GiaCoBan = giaCoBan;
+            this.Loai = "Topping";
+            this.HinhAnh = hinhAnh;
+            this.DangBan = dangBan;
         }
 
-        /// <summary>
-        /// ĐA HÌNH: Override - Topping KHÔNG cộng thêm tiền theo size
-        /// </summary>
+        // Ghi đè phương thức TinhTien của lớp cha (Tính đa hình)
         public override decimal TinhTien(string tuyChon = "")
         {
-            // Topping: Giá cố định, không phụ thuộc vào size/đường
-            return GiaCoBan;
+            // Topping có giá cố định, không cộng thêm tiền theo size
+            return this.GiaCoBan;
         }
     }
 
     // =======================================================
-    // TRỪU TƯỢNG: Factory Method để tạo SanPham từ Loai
+    // TRỪU TƯỢNG (Abstraction): Factory Pattern tạo đối tượng
     // =======================================================
     public static class SanPhamFactory
     {
-        /// <summary>
-        /// TRỪU TƯỢNG: Tạo đối tượng SanPham đúng kiểu dựa trên Loai (Đa hình)
-        /// </summary>
+        // Tạo sản phẩm đúng kiểu dựa trên chuỗi loai nhận được
         public static SanPham TaoSanPham(string loai, int id, string ten, decimal gia, string hinhAnh, bool dangBan)
         {
-            return loai switch
+            if (loai == "TraSua")
             {
-                "TraSua" => new TraSua(id, ten, gia, hinhAnh, dangBan),
-                "Topping" => new Topping(id, ten, gia, hinhAnh, dangBan),
-                _ => throw new ArgumentException($"Loại sản phẩm '{loai}' không hợp lệ!")
-            };
+                return new TraSua(id, ten, gia, hinhAnh, dangBan);
+            }
+            else if (loai == "Topping")
+            {
+                return new Topping(id, ten, gia, hinhAnh, dangBan);
+            }
+            else
+            {
+                throw new ArgumentException("Loại sản phẩm '" + loai + "' không hợp lệ!");
+            }
         }
     }
 }
