@@ -5,7 +5,7 @@ namespace QuanLyTraSua.Entities
 {
     /// <summary>
     /// Thực thể DonHang - Lưu thông tin đặt món của khách
-    /// ĐÓNG GÓI: Validation thông qua properties
+    /// ĐÓNG GÓI: Validation thông qua các thuộc tính getter/setter
     /// </summary>
     public class DonHang
     {
@@ -16,89 +16,114 @@ namespace QuanLyTraSua.Entities
         private string _trangThai = "Chờ xác nhận";
         private string _ghiChu = string.Empty;
 
-        // Danh sách trạng thái hợp lệ
-        public static readonly string[] DanhSachTrangThai =
-            { "Chờ xác nhận", "Đang pha chế", "Hoàn thành", "Đã hủy" };
+        // Danh sách trạng thái hợp lệ để đối chiếu
+        public static readonly string[] DanhSachTrangThai = new string[]
+        { 
+            "Chờ xác nhận", 
+            "Đang pha chế", 
+            "Hoàn thành", 
+            "Đã hủy" 
+        };
 
-        // ===== ĐÓNG GÓI: Properties =====
+        // ===== ĐÓNG GÓI (Encapsulation): Các thuộc tính được kiểm tra và đóng gói =====
         public int Id
         {
-            get => _id;
-            set => _id = value;
+            get { return _id; }
+            set { _id = value; }
         }
 
         public int KhachHangId
         {
-            get => _khachHangId;
+            get { return _khachHangId; }
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentException("ID Khách hàng không hợp lệ!");
+                }
                 _khachHangId = value;
             }
         }
 
         public DateTime ThoiGianDat
         {
-            get => _thoiGianDat;
-            set => _thoiGianDat = value;
+            get { return _thoiGianDat; }
+            set { _thoiGianDat = value; }
         }
 
         public decimal TongTien
         {
-            get => _tongTien;
+            get { return _tongTien; }
             set
             {
                 if (value < 0)
+                {
                     throw new ArgumentException("Tổng tiền không được âm!");
+                }
                 _tongTien = value;
             }
         }
 
         public string TrangThai
         {
-            get => _trangThai;
+            get { return _trangThai; }
             set
             {
                 if (Array.IndexOf(DanhSachTrangThai, value) == -1)
-                    throw new ArgumentException($"Trạng thái '{value}' không hợp lệ!");
+                {
+                    throw new ArgumentException("Trạng thái '" + value + "' không hợp lệ!");
+                }
                 _trangThai = value;
             }
         }
 
         public string GhiChu
         {
-            get => _ghiChu;
-            set => _ghiChu = value ?? string.Empty;
+            get { return _ghiChu; }
+            set { _ghiChu = value ?? string.Empty; }
         }
 
-        // Navigation property (không lưu DB)
+        // Các thuộc tính liên kết đối tượng (không lưu trong cơ sở dữ liệu SQLite)
         public NguoiDung? KhachHang { get; set; }
-        public List<ChiTietDonHang> DanhSachChiTiet { get; set; } = new();
+        public List<ChiTietDonHang> DanhSachChiTiet { get; set; } = new List<ChiTietDonHang>();
 
-        // Constructor
+        // Constructor mặc định (không tham số)
         public DonHang() { }
 
+        // Constructor khởi tạo nhanh khi khách đặt hàng
         public DonHang(int khachHangId, string ghiChu = "")
         {
-            KhachHangId = khachHangId;
-            ThoiGianDat = DateTime.Now;
-            TrangThai = "Chờ xác nhận";
-            GhiChu = ghiChu;
+            this.KhachHangId = khachHangId;
+            this.ThoiGianDat = DateTime.Now;
+            this.TrangThai = "Chờ xác nhận";
+            this.GhiChu = ghiChu;
         }
 
-        // Phương thức tính lại tổng tiền từ ChiTiet
+        // Phương thức tính lại tổng tiền từ danh sách chi tiết đơn hàng
         public void TinhLaiTongTien()
         {
             decimal tong = 0;
-            foreach (var ct in DanhSachChiTiet)
+            foreach (var ct in this.DanhSachChiTiet)
+            {
                 tong += ct.ThanhTien;
-            TongTien = tong;
+            }
+            this.TongTien = tong;
         }
 
-        public bool CoTheHuy() => _trangThai == "Chờ xác nhận";
+        // Đơn hàng chỉ có thể hủy nếu đang ở trạng thái Chờ xác nhận
+        public bool CoTheHuy()
+        {
+            if (this.TrangThai == "Chờ xác nhận")
+            {
+                return true;
+            }
+            return false;
+        }
 
-        public override string ToString() =>
-            $"Đơn #{Id} | {ThoiGianDat:dd/MM/yyyy HH:mm} | {TrangThai} | {TongTien:N0}đ";
+        // Chuyển đối tượng thành chuỗi dạng chữ để dễ hiển thị
+        public override string ToString()
+        {
+            return "Đơn #" + this.Id + " | " + this.ThoiGianDat.ToString("dd/MM/yyyy HH:mm") + " | " + this.TrangThai + " | " + this.TongTien.ToString("N0") + "đ";
+        }
     }
 }
