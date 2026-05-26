@@ -75,10 +75,12 @@ if (!window.chrome || !window.chrome.webview) {
                     const spIdx = products.findIndex(p => p.Id === msg.data.id);
                     if (spIdx !== -1) {
                         products[spIdx] = { 
-                            ...products[spIdx], 
-                            ...msg.data, 
-                            TenSanPham: msg.data.tenSanPham || products[spIdx].TenSanPham, 
-                            GiaCoBan: msg.data.giaCoBan || products[spIdx].GiaCoBan 
+                            Id: msg.data.id,
+                            TenSanPham: msg.data.tenSanPham !== undefined ? msg.data.tenSanPham : products[spIdx].TenSanPham,
+                            GiaCoBan: msg.data.giaCoBan !== undefined ? msg.data.giaCoBan : products[spIdx].GiaCoBan,
+                            Loai: msg.data.loai !== undefined ? msg.data.loai : products[spIdx].Loai,
+                            HinhAnh: msg.data.hinhAnh !== undefined ? msg.data.hinhAnh : products[spIdx].HinhAnh,
+                            DangBan: msg.data.dangBan !== undefined ? msg.data.dangBan : products[spIdx].DangBan
                         };
                         localStorage.setItem('mock_products', JSON.stringify(products));
                         response.ok = true;
