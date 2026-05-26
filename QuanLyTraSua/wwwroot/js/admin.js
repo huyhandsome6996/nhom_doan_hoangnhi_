@@ -173,9 +173,19 @@ function filterSanPham() {
     const id = sp.id || sp.Id;
     const loai = sp.loai || sp.Loai;
     const dangBan = sp.dangBan !== undefined ? sp.dangBan : sp.DangBan;
+    const imgUrl = sp.hinhAnh || sp.HinhAnh || '';
+    const imgHtml = imgUrl 
+      ? `<img src="${imgUrl}" style="width:36px;height:36px;border-radius:6px;object-fit:cover;flex-shrink:0;border:1px solid var(--clr-border);" />`
+      : `<span style="font-size:1.6rem;line-height:1;width:36px;height:36px;background:var(--clr-surface2);border-radius:6px;display:flex;align-items:center;justify-content:center;">${loai === 'TraSua' ? '🧋' : '🍮'}</span>`;
+
     return `<tr>
       <td>${id}</td>
-      <td><strong>${sp.tenSanPham || sp.TenSanPham}</strong></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:12px;">
+          ${imgHtml}
+          <strong>${sp.tenSanPham || sp.TenSanPham}</strong>
+        </div>
+      </td>
       <td style="color:var(--clr-primary);font-weight:700;">${fmt(sp.giaCoBan || sp.GiaCoBan)}</td>
       <td><span class="badge badge-${loai.toLowerCase()}">${loai}</span></td>
       <td><span class="badge badge-${dangBan ? 'success' : 'danger'}">${dangBan ? 'Còn hàng' : 'Hết hàng'}</span></td>
@@ -192,6 +202,9 @@ function openSanPhamModal(sp) {
   document.getElementById('spTen').value = sp ? (sp.tenSanPham || sp.TenSanPham) : '';
   document.getElementById('spGia').value = sp ? (sp.giaCoBan || sp.GiaCoBan) : '';
   document.getElementById('spLoai').value = sp ? (sp.loai || sp.Loai) : 'TraSua';
+  document.getElementById('spHinhAnh').value = sp ? (sp.hinhAnh || sp.HinhAnh || '') : '';
+  document.getElementById('spFile').value = '';
+  previewUrl(sp ? (sp.hinhAnh || sp.HinhAnh || '') : '');
   document.getElementById('spDangBan').value = sp ? String(sp.dangBan !== undefined ? sp.dangBan : sp.DangBan) : 'true';
   openModal('sanPhamModal');
 }
@@ -208,7 +221,7 @@ function luuSanPham() {
     tenSanPham: document.getElementById('spTen').value.trim(),
     giaCoBan: parseFloat(document.getElementById('spGia').value),
     loai: document.getElementById('spLoai').value,
-    hinhAnh: '',
+    hinhAnh: document.getElementById('spHinhAnh').value.trim(),
     dangBan: document.getElementById('spDangBan').value === 'true'
   };
   if (!data.tenSanPham || isNaN(data.giaCoBan)) { toast('error', '❌ Vui lòng nhập đầy đủ thông tin!'); return; }
@@ -219,6 +232,34 @@ function luuSanPham() {
 function xoaSanPham(id) {
   if (!confirm('Bạn có chắc muốn xóa sản phẩm này?')) return;
   sendMsg('xoaSanPham', { id });
+}
+
+function previewFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const base64 = e.target.result;
+    document.getElementById('spImagePreview').innerHTML = `<img src="${base64}" style="width:100%;height:100%;object-fit:cover;" />`;
+    document.getElementById('spHinhAnh').value = base64;
+  };
+  reader.readAsDataURL(file);
+}
+
+function previewUrl(url) {
+  const loai = document.getElementById('spLoai').value;
+  if (url) {
+    document.getElementById('spImagePreview').innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='⚠️'" />`;
+  } else {
+    document.getElementById('spImagePreview').innerHTML = loai === 'TraSua' ? '🧋' : '🍮';
+  }
+}
+
+function clearPreview() {
+  document.getElementById('spFile').value = '';
+  document.getElementById('spHinhAnh').value = '';
+  const loai = document.getElementById('spLoai').value;
+  document.getElementById('spImagePreview').innerHTML = loai === 'TraSua' ? '🧋' : '🍮';
 }
 
 // ===== NGƯỜI DÙNG =====

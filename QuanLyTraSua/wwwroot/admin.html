@@ -136,11 +136,25 @@
       </div>
       <div class="form-group">
         <label class="form-label">Loại</label>
-        <select id="spLoai" class="form-control">
+        <select id="spLoai" class="form-control" onchange="previewUrl(document.getElementById('spHinhAnh').value)">
           <option value="TraSua">Trà Sữa</option>
           <option value="Topping">Topping</option>
         </select>
       </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Ảnh sản phẩm</label>
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:8px;">
+        <div id="spImagePreview" style="width:60px;height:60px;border-radius:8px;background:var(--clr-surface2);display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--clr-border);font-size:2rem;">
+          🧋
+        </div>
+        <div style="flex:1;">
+          <input type="file" id="spFile" class="form-control" accept="image/*" style="display:none;" onchange="previewFile(this)">
+          <button class="btn btn-secondary btn-sm" type="button" onclick="document.getElementById('spFile').click()">📂 Chọn file từ máy...</button>
+          <button class="btn btn-danger btn-sm" type="button" style="padding: 5px 8px;" onclick="clearPreview()">✕ Xóa ảnh</button>
+        </div>
+      </div>
+      <input id="spHinhAnh" class="form-control" placeholder="Hoặc nhập link ảnh (URL)..." oninput="previewUrl(this.value)">
     </div>
     <div class="form-group">
       <label class="form-label">Trạng thái</label>
