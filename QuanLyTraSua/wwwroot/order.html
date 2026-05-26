@@ -169,15 +169,22 @@
       grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🍵</div><h3>Chưa có sản phẩm</h3></div>';
       return;
     }
-    grid.innerHTML = filtered.map(sp => `
+    grid.innerHTML = filtered.map(sp => {
+      const imgUrl = sp.hinhAnh || sp.HinhAnh || '';
+      const imgHtml = imgUrl 
+        ? `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" />`
+        : ((sp.loai || sp.Loai) === 'TraSua' ? '🧋' : '🍮');
+
+      return `
       <div class="menu-card fade-in" onclick="openOption(${sp.id || sp.Id})">
-        <div class="menu-card-img">${(sp.loai || sp.Loai) === 'TraSua' ? '🧋' : '🍮'}</div>
+        <div class="menu-card-img">${imgHtml}</div>
         <div class="menu-card-body">
           <div class="menu-card-name">${sp.tenSanPham || sp.TenSanPham}</div>
           <div class="menu-card-price">${fmt(sp.giaCoBan || sp.GiaCoBan)}</div>
           <span class="badge badge-${(sp.loai||sp.Loai).toLowerCase()}" style="margin-top:6px;">${sp.loai || sp.Loai}</span>
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
   }
 
   function openOption(spId) {
